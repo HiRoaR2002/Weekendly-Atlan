@@ -162,17 +162,45 @@ const useWeekendPlanner = () => {
   };
 
   const addActivity = (activity, day = 'saturday') => {
-    const conflict = isConflict(day, activity);
-    if (conflict) {
-      toast.error(
-        `Time conflict with ${conflict.name} (${conflict.time} - ${new Date(new Date(`1970-01-01T${conflict.time}`).getTime() + conflict.duration * 60000).toTimeString().slice(0, 5)})`
-      );
-      return;
+    const otherDay = day === 'saturday' ? 'sunday' : 'saturday';
+
+    const isAlreadyOnDay = scheduledActivities[day].some(a => a.id === activity.id);
+    const isAlreadyOnOtherDay = scheduledActivities[otherDay].some(a => a.id === activity.id);
+
+    if (isAlreadyOnDay) {
+      if (isAlreadyOnOtherDay) {
+        toast.error(`${activity.name} is already planned for the entire weekend.`);
+        return;
+      } else {
+        const conflictOnOtherDay = isConflict(otherDay, activity);
+        if (conflictOnOtherDay) {
+          toast.error(
+            `${activity.name} is on ${day} and has a time conflict on ${otherDay} with ${conflictOnOtherDay.name}.`
+          );
+          return;
+        } else {
+          setScheduledActivities(prev => ({
+            ...prev,
+            [otherDay]: [...prev[otherDay], activity]
+          }));
+          toast.success(`${activity.name} was added to ${otherDay}.`);
+          return;
+        }
+      }
+    } else {
+      const conflictOnDay = isConflict(day, activity);
+      if (conflictOnDay) {
+        toast.error(
+          `Time conflict on ${day} with ${conflictOnDay.name}.`
+        );
+        return;
+      } else {
+        setScheduledActivities(prev => ({
+          ...prev,
+          [day]: [...prev[day], activity]
+        }));
+      }
     }
-    setScheduledActivities(prev => ({
-      ...prev,
-      [day]: [...prev[day].filter(a => a.id !== activity.id), activity]
-    }));
   };
 
   const addActivityToBucket = (activity) => {
@@ -196,42 +224,49 @@ const useWeekendPlanner = () => {
   };
 
   const pushBucketToPlan = () => {
-    const newScheduledActivities = {
-      saturday: [...scheduledActivities.saturday],
-      sunday: [...scheduledActivities.sunday]
-    };
-    const unaddedActivities = [];
+    let newScheduledActivities = { ...scheduledActivities };
+    let bucket = [...activityBucket];
+    let changesMade = false;
 
-    activityBucket.forEach((activity, index) => {
-      const primaryDay = index % 2 === 0 ? 'saturday' : 'sunday';
-      const secondaryDay = primaryDay === 'saturday' ? 'sunday' : 'saturday';
+    bucket.forEach(activity => {
+      const isAlreadyOnSaturday = newScheduledActivities.saturday.some(a => a.id === activity.id);
+      const isAlreadyOnSunday = newScheduledActivities.sunday.some(a => a.id === activity.id);
 
-      let conflict = isConflict(primaryDay, activity);
-      if (conflict) {
-        conflict = isConflict(secondaryDay, activity);
-        if (conflict) {
-          unaddedActivities.push({ activity, conflict });
-        } else {
-          newScheduledActivities[secondaryDay].push(activity);
+      if (isAlreadyOnSaturday && isAlreadyOnSunday) {
+        toast.error(`${activity.name} is already planned for the entire weekend.`);
+        return;
+      }
+
+      const tryAddingToDay = (day) => {
+        if (newScheduledActivities[day].some(a => a.id === activity.id)) {
+          return false; // Already on this day
         }
-      } else {
-        newScheduledActivities[primaryDay].push(activity);
+        const conflict = isConflict(day, activity);
+        if (conflict) {
+          toast.error(`Time conflict for ${activity.name} on ${day} with ${conflict.name}.`);
+          return false;
+        }
+        newScheduledActivities = {
+          ...newScheduledActivities,
+          [day]: [...newScheduledActivities[day], activity]
+        };
+        changesMade = true;
+        return true;
+      };
+
+      if (!isAlreadyOnSaturday) {
+        if (tryAddingToDay('saturday')) return;
+      }
+      if (!isAlreadyOnSunday) {
+        if (tryAddingToDay('sunday')) return;
       }
     });
 
-    if (unaddedActivities.length > 0) {
-      unaddedActivities.forEach(({ activity, conflict }) => {
-        toast.error(
-          `${activity.name} conflicts with ${conflict.name} (${conflict.time} - ${new Date(new Date(`1970-01-01T${conflict.time}`).getTime() + conflict.duration * 60000).toTimeString().slice(0, 5)})`
-        );
-      });
+    if (changesMade) {
+      setScheduledActivities(newScheduledActivities);
+      toast.success('Activities from the bucket have been added to your plan!');
     }
-
-    setScheduledActivities(newScheduledActivities);
     setActivityBucket([]);
-    if (unaddedActivities.length < activityBucket.length) {
-      toast.success('Activities pushed to plan!');
-    }
   };
 
   const updateActivityTime = (activityId, day, newTime) => {
