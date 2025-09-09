@@ -23,7 +23,14 @@ const App = () => {
     updateActivityTime,
     generateSummary,
     themes,
-    activityCategories
+    activityCategories,
+    addActivityToBucket,
+    activityBucket,
+    handleDropOnBucket,
+    removeActivityFromBucket,
+    pushBucketToPlan,
+    isDragging,
+    handleDragEnd
   } = useWeekendPlanner();
 
   return (
@@ -38,7 +45,15 @@ const App = () => {
             selectedTheme={selectedTheme}
             applyTheme={applyTheme}
             activityCategories={activityCategories}
-            addActivity={addActivity}
+            addActivityToBucket={addActivityToBucket}
+            activityBucket={activityBucket}
+            handleDropOnBucket={handleDropOnBucket}
+            handleDragOver={handleDragOver}
+            handleDragStart={handleDragStart}
+            handleDragEnd={handleDragEnd}
+            isDragging={isDragging}
+            removeActivityFromBucket={removeActivityFromBucket}
+            pushBucketToPlan={pushBucketToPlan}
           />
         )}
         {currentView === 'plan' && (

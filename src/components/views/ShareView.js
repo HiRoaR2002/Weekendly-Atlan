@@ -1,9 +1,10 @@
 import React, { useRef } from 'react';
 import { toPng } from 'html-to-image';
 import { Sun, Moon, Clock, Share2, Download } from 'lucide-react';
+import * as Icons from 'lucide-react';
 
 const ShareView = ({ themes, selectedTheme, scheduledActivities, generateSummary }) => {
-  const ThemeIcon = themes[selectedTheme].icon;
+  const ThemeIcon = Icons[themes[selectedTheme].icon];
   const cardRef = useRef();
 
   const handleDownload = () => {
@@ -24,14 +25,19 @@ const ShareView = ({ themes, selectedTheme, scheduledActivities, generateSummary
   const handleShare = () => {
     if (cardRef.current) {
       toPng(cardRef.current)
-        .then((dataUrl) => {
-          const file = new File([dataUrl], 'weekend-plan.png', { type: 'image/png' });
+        .then(async (dataUrl) => {
+          const blob = await fetch(dataUrl).then(res => res.blob());
+          const file = new File([blob], 'weekend-plan.png', { type: 'image/png' });
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            navigator.share({
-              files: [file],
-              title: 'My Weekend Plan',
-              text: generateSummary(),
-            });
+            try {
+              await navigator.share({
+                files: [file],
+                title: 'My Weekend Plan',
+                text: generateSummary(),
+              });
+            } catch (err) {
+              console.error('Share failed:', err);
+            }
           } else {
             alert('Sharing not supported on this browser.');
           }

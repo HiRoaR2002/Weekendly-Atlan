@@ -10,7 +10,7 @@ const vibeColors = {
   adventurous: 'bg-orange-400 text-orange-900'
 };
 
-const ActivityCard = ({ activity, day, showTime = true, isDraggable = true, onDragStart, onRemove, onTimeChange }) => {
+const ActivityCard = ({ activity, day, showTime = true, isDraggable = true, onDragStart, onDragEnd, onRemove, onTimeChange }) => {
   const IconComponent = Icons[activity.icon] || Star;
 
   return (
@@ -18,6 +18,7 @@ const ActivityCard = ({ activity, day, showTime = true, isDraggable = true, onDr
       className={`bg-white rounded-xl shadow-sm border-2 border-transparent hover:border-purple-200 transition-all duration-200 p-4 ${isDraggable ? 'cursor-move hover:shadow-md' : ''}`}
       draggable={isDraggable}
       onDragStart={(e) => isDraggable && onDragStart(e, activity)}
+      onDragEnd={() => isDraggable && onDragEnd && onDragEnd()}
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center space-x-3">

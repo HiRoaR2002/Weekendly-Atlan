@@ -1,15 +1,49 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import ActivityCard from '../ui/ActivityCard';
+import { ShoppingCart, ArrowRight } from 'lucide-react';
+import ActivityBucket from '../ui/ActivityBucket';
 import * as Icons from 'lucide-react';
 
-const BrowseView = ({ themes, selectedTheme, applyTheme, activityCategories, addActivity }) => {
+const BrowseView = ({
+  themes,
+  selectedTheme,
+  applyTheme,
+  activityCategories,
+  addActivityToBucket,
+  activityBucket,
+  handleDropOnBucket,
+  handleDragOver,
+  handleDragStart,
+  handleDragEnd,
+  isDragging,
+  removeActivityFromBucket,
+  pushBucketToPlan
+}) => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Vibe</h2>
         <p className="text-gray-600">Select a theme or pick individual activities</p>
       </div>
+
+      <ActivityBucket
+        bucket={activityBucket}
+        onDrop={handleDropOnBucket}
+        onDragOver={handleDragOver}
+        onRemove={removeActivityFromBucket}
+        isDragging={isDragging}
+      />
+
+      {activityBucket.length > 0 && (
+        <div className="cart">
+          <ShoppingCart className="w-6 h-6" />
+          <span>{activityBucket.length} items</span>
+          <button onClick={pushBucketToPlan} className="push-to-plan-btn">
+            Add Plans<ArrowRight className="w-4 h-4 inline" />
+          </button>
+        </div>
+      )}
 
       {/* Theme Selection */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
@@ -46,9 +80,15 @@ const BrowseView = ({ themes, selectedTheme, applyTheme, activityCategories, add
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {category.activities.map(activity => (
                   <div key={activity.id} className="relative">
-                    <ActivityCard activity={{ ...activity, categoryColor: category.color }} isDraggable={false} showTime={false} />
+                    <ActivityCard
+                      activity={{ ...activity, categoryColor: category.color }}
+                      isDraggable={true}
+                      showTime={false}
+                      onDragStart={handleDragStart}
+                      onDragEnd={handleDragEnd}
+                    />
                     <button
-                      onClick={() => addActivity({ ...activity, categoryColor: category.color })}
+                      onClick={() => addActivityToBucket({ ...activity, categoryColor: category.color })}
                       className="absolute top-2 right-2 bg-purple-500 text-white rounded-full p-1 hover:bg-purple-600 transition-colors"
                     >
                       <Plus className="w-4 h-4" />

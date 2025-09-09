@@ -1,6 +1,7 @@
 import React from 'react';
-import { Sun, Moon, Calendar } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import ActivityCard from '../ui/ActivityCard';
+import WeatherIcon from '../ui/WeatherIcon';
 
 const PlanView = ({ scheduledActivities, handleDragStart, handleDragOver, handleDrop, removeActivity, updateActivityTime }) => {
   return (
@@ -19,7 +20,7 @@ const PlanView = ({ scheduledActivities, handleDragStart, handleDragOver, handle
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
-              <Sun className="w-6 h-6 text-yellow-500" />
+              <WeatherIcon day="saturday" />
               <h3 className="text-xl font-bold text-gray-900">Saturday</h3>
             </div>
             <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-gray-600">
@@ -58,7 +59,7 @@ const PlanView = ({ scheduledActivities, handleDragStart, handleDragOver, handle
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
-              <Moon className="w-6 h-6 text-indigo-500" />
+              <WeatherIcon day="sunday" />
               <h3 className="text-xl font-bold text-gray-900">Sunday</h3>
             </div>
             <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-gray-600">
