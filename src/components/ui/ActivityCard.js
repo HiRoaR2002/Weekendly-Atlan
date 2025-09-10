@@ -16,7 +16,7 @@ const ActivityCard = ({ activity, day, showTime = true, isDraggable = true, onDr
 
   return (
     <div
-      className={`relative bg-white rounded-xl shadow-sm border-2 border-transparent hover:border-purple-200 transition-all duration-200 p-4 ${isDraggable ? 'cursor-move hover:shadow-md' : ''} ${isHovered ? 'shake' : ''}`}
+      className={`relative bg-white rounded-xl shadow-sm border-2 border-transparent hover:border-blue-200 transition-all duration-200 p-4 ${isDraggable ? 'cursor-move hover:shadow-md' : ''} ${isHovered ? 'shake' : ''}`}
       draggable={isDraggable}
       onDragStart={(e) => isDraggable && onDragStart(e, activity)}
       onDragEnd={() => isDraggable && onDragEnd && onDragEnd()}
@@ -34,7 +34,7 @@ const ActivityCard = ({ activity, day, showTime = true, isDraggable = true, onDr
         {onRemove && (
           <button
             onClick={() => onRemove(activity.id, day)}
-            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors"
+            className="absolute top-2 right-2 text-gray-400 hover:text-red-600 transition-colors"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >

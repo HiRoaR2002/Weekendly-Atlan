@@ -39,7 +39,7 @@
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #6d28d9;
+  background-color: #2563eb;
   color: white;
   padding: 1rem;
   border-radius: 9999px;
@@ -53,7 +53,7 @@
 
 .push-to-plan-btn {
   background-color: white;
-  color: #6d28d9;
+  color: #2563eb;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 9999px;

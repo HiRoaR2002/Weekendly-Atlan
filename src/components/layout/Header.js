@@ -28,14 +28,14 @@ const Header = ({ currentView, setCurrentView }) => {
   }, []);
 
   return (
-    <header className={`bg-white shadow-sm border-b border-purple-100 sticky-header ${isScrolled ? 'scrolled' : ''}`}>
+    <header className={`bg-white shadow-sm border-b border-blue-100 sticky-header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-xl">
+            <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-2 rounded-xl">
               <Calendar className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
               Weekendly
             </h1>
           </div>
@@ -50,8 +50,8 @@ const Header = ({ currentView, setCurrentView }) => {
                 key={key}
                 onClick={() => setCurrentView(key)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${currentView === key
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:text-blue-700 hover:bg-blue-100'
                   }`}
               >
                 <Icon className="w-4 h-4" />

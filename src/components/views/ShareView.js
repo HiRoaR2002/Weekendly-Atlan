@@ -56,7 +56,7 @@ const ShareView = ({ themes, selectedTheme, scheduledActivities, generateSummary
       </div>
 
       {/* Shareable Card */}
-      <div ref={cardRef} className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-8 text-white">
+      <div ref={cardRef} className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-3xl p-8 text-white">
         <div className="text-center mb-6">
           <ThemeIcon className="w-12 h-12 mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-2">My {themes[selectedTheme].name}</h3>

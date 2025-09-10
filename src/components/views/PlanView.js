@@ -56,15 +56,15 @@ const PlanView = ({
               <div className="flex items-center space-x-3">
                 <WeatherIcon day={day} weather={weather} />
                 <h3 className="text-xl font-bold text-gray-900 capitalize">{day}</h3>
-              </div>
-              {isRainy(day) && (
-                <div className="relative group">
-                  <AlertTriangle className="w-5 h-5 text-yellow-600" />
-                  <div className="absolute bottom-full mb-2 w-max bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Outdoor activities not recommended
+                {isRainy(day) && (
+                  <div className="relative group">
+                    <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                    <div className="absolute bottom-full mb-2 w-max bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Outdoor activities not recommended
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
               <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-gray-600">
                 {scheduledActivities[day].length} activities
               </span>

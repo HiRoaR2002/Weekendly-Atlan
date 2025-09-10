@@ -6,7 +6,7 @@ const FloatingActionButton = ({ currentView, onClick }) => {
     <div className="fixed bottom-6 right-6 md:hidden">
       <button
         onClick={onClick}
-        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+        className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"
       >
         {currentView === 'browse' ? <Calendar className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
       </button>

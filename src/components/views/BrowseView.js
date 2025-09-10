@@ -61,8 +61,8 @@ const BrowseView = ({
               key={key}
               onClick={() => applyTheme(key)}
               className={`p-4 rounded-xl border-2 transition-all duration-200 text-center ${selectedTheme === key
-                ? 'border-purple-500 bg-purple-50'
-                : 'border-gray-200 hover:border-purple-300'
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:border-blue-300'
                 }`}
             >
               <IconComponent className="w-8 h-8 mx-auto mb-2" />
@@ -102,7 +102,7 @@ const BrowseView = ({
                     />
                     <button
                       onClick={() => addActivityToBucket({ ...activity, categoryColor: category.color })}
-                      className="absolute top-2 right-2 bg-purple-500 text-white rounded-full p-1 hover:bg-purple-600 transition-colors"
+                      className="absolute top-2 right-2 bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
