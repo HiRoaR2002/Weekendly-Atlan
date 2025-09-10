@@ -1,49 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Sun, Cloud, CloudRain, CloudSnow, CloudLightning } from 'lucide-react';
 
-const WeatherIcon = ({ day }) => {
-  const [weather, setWeather] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchWeather = async (latitude, longitude) => {
-      try {
-        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weathercode&timezone=auto`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch weather data');
-        }
-        const data = await response.json();
-        const dayIndex = day === 'saturday' ? 0 : 1;
-        const weatherCode = data.daily.weathercode[dayIndex];
-        setWeather(getWeatherIcon(weatherCode));
-      } catch (error) {
-        console.error("Error fetching weather:", error);
-        setError('Could not fetch weather');
-      }
-    };
-
-    const getLocation = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            fetchWeather(position.coords.latitude, position.coords.longitude);
-          },
-          (error) => {
-            console.error("Error getting location:", error);
-            setError('Location access denied');
-            // Fallback to a default location if user denies access
-            fetchWeather(51.5074, -0.1278); // London
-          }
-        );
-      } else {
-        setError("Geolocation is not supported by this browser.");
-        // Fallback to a default location if geolocation is not supported
-        fetchWeather(51.5074, -0.1278); // London
-      }
-    };
-
-    getLocation();
-  }, [day]);
+const WeatherIcon = ({ day, weather }) => {
 
   const getWeatherIcon = (code) => {
     if (code >= 0 && code <= 1) return <Sun className="w-6 h-6 text-yellow-500" />;
@@ -54,11 +12,11 @@ const WeatherIcon = ({ day }) => {
     return <Sun className="w-6 h-6 text-yellow-500" />; // Default icon
   };
 
-  if (error) {
-    return <span title={error}>☀️</span>;
+  if (!weather || !weather[day]) {
+    return <Sun className="w-6 h-6 text-yellow-500" />;
   }
 
-  return weather;
+  return getWeatherIcon(weather[day]);
 };
 
 export default WeatherIcon;

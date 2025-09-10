@@ -2,12 +2,12 @@ import React from 'react';
 import ActivityCard from './ActivityCard';
 import './ActivityBucket.css';
 
-const ActivityBucket = ({ bucket, onDrop, onDragOver, onRemove, isDragging }) => {
+const ActivityBucket = ({ bucket, onDrop, onDragOver, onRemove, isDragging, onTimeChange, isBucketOpen }) => {
   return (
     <div
       onDrop={onDrop}
       onDragOver={onDragOver}
-      className={`activity-bucket ${isDragging ? 'dragging' : ''}`}
+      className={`activity-bucket ${isDragging ? 'dragging' : ''} ${isBucketOpen ? 'open' : ''}`}
     >
       <h3 className="bucket-title">Drop here</h3>
       {bucket.length === 0 ? (
@@ -20,7 +20,8 @@ const ActivityBucket = ({ bucket, onDrop, onDragOver, onRemove, isDragging }) =>
               activity={activity}
               onRemove={onRemove}
               isDraggable={false}
-              showTime={false}
+              showTime={true}
+              onTimeChange={(activityId, _, newTime) => onTimeChange(activityId, newTime)}
             />
           ))}
         </div>

@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { themes, activityCategories } from '../constants';
+import { themes, activityCategories, weekendOptions } from '../constants';
 
 const useWeekendPlanner = () => {
   const [selectedTheme, setSelectedTheme] = useState('balanced');
   const [weather, setWeather] = useState(null);
+  const [weekendOption, setWeekendOption] = useState('twoDays');
   const [scheduledActivities, setScheduledActivities] = useState(() => {
     const saved = localStorage.getItem('weekendly-schedule');
-    return saved ? JSON.parse(saved) : { saturday: [], sunday: [] };
+    const initialSchedule = {};
+    weekendOptions[weekendOption].days.forEach(day => {
+      initialSchedule[day] = [];
+    });
+    return saved ? JSON.parse(saved) : initialSchedule;
   });
   const [draggedActivity, setDraggedActivity] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -16,6 +21,7 @@ const useWeekendPlanner = () => {
     const saved = localStorage.getItem('weekendly-bucket');
     return saved ? JSON.parse(saved) : [];
   });
+  const [isBucketOpen, setIsBucketOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('weekendly-schedule', JSON.stringify(scheduledActivities));
@@ -124,20 +130,36 @@ const useWeekendPlanner = () => {
       allActivities.find(a => a.id === activityId)
     ).filter(Boolean);
 
-    const saturday = themeActivities.slice(0, Math.ceil(themeActivities.length / 2));
-    const sunday = themeActivities.slice(Math.ceil(themeActivities.length / 2));
+    const days = weekendOptions[weekendOption].days;
+    const newSchedule = {};
+    days.forEach(day => {
+      newSchedule[day] = [];
+    });
 
-    setScheduledActivities({ saturday, sunday });
+    themeActivities.forEach((activity, index) => {
+      const dayIndex = index % days.length;
+      const day = days[dayIndex];
+      newSchedule[day].push(activity);
+    });
+
+    setScheduledActivities(newSchedule);
+    toast.success(`${theme.name} added to plan`);
   };
 
   const handleDragStart = (e, activity) => {
     setDraggedActivity(activity);
     setIsDragging(true);
     e.dataTransfer.effectAllowed = 'move';
+    if (currentView === 'browse') {
+      setIsBucketOpen(true);
+    }
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
+    if (currentView === 'browse') {
+      setIsBucketOpen(false);
+    }
   };
 
   const handleDragOver = (e) => {
@@ -148,6 +170,20 @@ const useWeekendPlanner = () => {
   const handleDrop = (e, day) => {
     e.preventDefault();
     if (draggedActivity) {
+      const originalDay = Object.keys(scheduledActivities).find(d =>
+        scheduledActivities[d].some(a => a.id === draggedActivity.id)
+      );
+
+      if (originalDay && originalDay !== day) {
+        const conflict = isConflict(day, draggedActivity);
+        if (conflict) {
+          toast.error(`Time conflict on ${day} with ${conflict.name}.`);
+          setDraggedActivity(null);
+          return;
+        }
+        removeActivity(draggedActivity.id, originalDay);
+      }
+
       addActivity(draggedActivity, day);
       setDraggedActivity(null);
     }
@@ -161,46 +197,35 @@ const useWeekendPlanner = () => {
     }
   };
 
-  const addActivity = (activity, day = 'saturday') => {
-    const otherDay = day === 'saturday' ? 'sunday' : 'saturday';
-
-    const isAlreadyOnDay = scheduledActivities[day].some(a => a.id === activity.id);
-    const isAlreadyOnOtherDay = scheduledActivities[otherDay].some(a => a.id === activity.id);
-
-    if (isAlreadyOnDay) {
-      if (isAlreadyOnOtherDay) {
-        toast.error(`${activity.name} is already planned for the entire weekend.`);
-        return;
+  const addActivity = (activity, day) => {
+    if (!day) {
+      // Find the first day with no conflict
+      const availableDay = weekendOptions[weekendOption].days.find(d => !isConflict(d, activity));
+      if (availableDay) {
+        day = availableDay;
       } else {
-        const conflictOnOtherDay = isConflict(otherDay, activity);
-        if (conflictOnOtherDay) {
-          toast.error(
-            `${activity.name} is on ${day} and has a time conflict on ${otherDay} with ${conflictOnOtherDay.name}.`
-          );
-          return;
-        } else {
-          setScheduledActivities(prev => ({
-            ...prev,
-            [otherDay]: [...prev[otherDay], activity]
-          }));
-          toast.success(`${activity.name} was added to ${otherDay}.`);
-          return;
-        }
-      }
-    } else {
-      const conflictOnDay = isConflict(day, activity);
-      if (conflictOnDay) {
-        toast.error(
-          `Time conflict on ${day} with ${conflictOnDay.name}.`
-        );
+        toast.error(`No available slot for ${activity.name}.`);
         return;
-      } else {
-        setScheduledActivities(prev => ({
-          ...prev,
-          [day]: [...prev[day], activity]
-        }));
       }
     }
+
+    const isAlreadyOnDay = scheduledActivities[day] && scheduledActivities[day].some(a => a.id === activity.id);
+
+    if (isAlreadyOnDay) {
+      // If it's already on the target day, do nothing.
+      return;
+    }
+
+    const conflict = isConflict(day, activity);
+    if (conflict) {
+      toast.error(`Time conflict on ${day} with ${conflict.name}.`);
+      return;
+    }
+
+    setScheduledActivities(prev => ({
+      ...prev,
+      [day]: [...prev[day], activity]
+    }));
   };
 
   const addActivityToBucket = (activity) => {
@@ -228,37 +253,40 @@ const useWeekendPlanner = () => {
     let bucket = [...activityBucket];
     let changesMade = false;
 
+    // 1. Sort activities by start time
+    bucket.sort((a, b) => a.time.localeCompare(b.time));
+
+    const days = weekendOptions[weekendOption].days;
+    let dayIndex = 0;
+
     bucket.forEach(activity => {
-      const isAlreadyOnSaturday = newScheduledActivities.saturday.some(a => a.id === activity.id);
-      const isAlreadyOnSunday = newScheduledActivities.sunday.some(a => a.id === activity.id);
+      const isAlreadyScheduled = Object.values(newScheduledActivities).flat().some(a => a.id === activity.id);
 
-      if (isAlreadyOnSaturday && isAlreadyOnSunday) {
-        toast.error(`${activity.name} is already planned for the entire weekend.`);
-        return;
+      if (isAlreadyScheduled) {
+        toast.error(`${activity.name} is already planned for the weekend.`);
+        return; // continue to next activity in forEach
       }
 
-      const tryAddingToDay = (day) => {
-        if (newScheduledActivities[day].some(a => a.id === activity.id)) {
-          return false; // Already on this day
-        }
-        const conflict = isConflict(day, activity);
-        if (conflict) {
-          toast.error(`Time conflict for ${activity.name} on ${day} with ${conflict.name}.`);
-          return false;
-        }
-        newScheduledActivities = {
-          ...newScheduledActivities,
-          [day]: [...newScheduledActivities[day], activity]
-        };
-        changesMade = true;
-        return true;
-      };
+      let assigned = false;
+      // Start from the current dayIndex and try all days
+      for (let i = 0; i < days.length; i++) {
+        const currentDay = days[(dayIndex + i) % days.length];
 
-      if (!isAlreadyOnSaturday) {
-        if (tryAddingToDay('saturday')) return;
+        if (!isConflict(currentDay, activity)) {
+          newScheduledActivities = {
+            ...newScheduledActivities,
+            [currentDay]: [...newScheduledActivities[currentDay], activity]
+          };
+          changesMade = true;
+          assigned = true;
+          // For the next activity, we want to start with the next day
+          dayIndex = (dayIndex + i + 1) % days.length;
+          break; // Activity assigned, move to the next one
+        }
       }
-      if (!isAlreadyOnSunday) {
-        if (tryAddingToDay('sunday')) return;
+
+      if (!assigned) {
+        toast.error(`No available slot for ${activity.name}.`);
       }
     });
 
@@ -286,16 +314,66 @@ const useWeekendPlanner = () => {
     }));
   };
 
+  const updateActivityBucketTime = (activityId, newTime) => {
+    setActivityBucket(prev =>
+      prev.map(a =>
+        a.id === activityId ? { ...a, time: newTime } : a
+      )
+    );
+  };
+
   const generateSummary = () => {
-    const totalActivities = scheduledActivities.saturday.length + scheduledActivities.sunday.length;
+    const totalActivities = Object.values(scheduledActivities).flat().length;
     if (totalActivities === 0) return "Plan your perfect weekend with Weekendly!";
 
     return `My ${themes[selectedTheme].name.toLowerCase()} includes ${totalActivities} amazing activities! 🎉`;
   };
 
+  const handleWeekendOptionChange = (option) => {
+    setWeekendOption(option);
+    const newSchedule = {};
+    const newDays = weekendOptions[option].days;
+    newDays.forEach(day => {
+      newSchedule[day] = scheduledActivities[day] || [];
+    });
+
+    const oldDays = Object.keys(scheduledActivities);
+    const removedDays = oldDays.filter(day => !newDays.includes(day));
+    const activitiesToReassign = removedDays.flatMap(day => scheduledActivities[day]);
+
+    activitiesToReassign.forEach(activity => {
+      let assigned = false;
+      for (const day of newDays) {
+        const newStartTime = activity.time;
+        const newEndTime = new Date(new Date(`1970-01-01T${newStartTime}`).getTime() + activity.duration * 60000).toTimeString().slice(0, 5);
+
+        const conflict = newSchedule[day].find(a => {
+          if (a.id === activity.id) return false;
+          const existingStartTime = a.time;
+          const existingEndTime = new Date(new Date(`1970-01-01T${existingStartTime}`).getTime() + a.duration * 60000).toTimeString().slice(0, 5);
+          return (newStartTime < existingEndTime && newEndTime > existingStartTime);
+        });
+
+        if (!conflict) {
+          newSchedule[day].push(activity);
+          assigned = true;
+          break;
+        }
+      }
+
+      if (!assigned) {
+        addActivityToBucket(activity);
+      }
+    });
+
+    setScheduledActivities(newSchedule);
+  };
+
   return {
     selectedTheme,
     scheduledActivities,
+    weekendOption,
+    handleWeekendOptionChange,
     weather,
     currentView,
     setCurrentView,
@@ -313,9 +391,13 @@ const useWeekendPlanner = () => {
     pushBucketToPlan,
     removeActivity,
     updateActivityTime,
+    updateActivityBucketTime,
     generateSummary,
     themes,
-    activityCategories
+    activityCategories,
+    weekendOptions,
+    isBucketOpen,
+    setIsBucketOpen
   };
 };
 

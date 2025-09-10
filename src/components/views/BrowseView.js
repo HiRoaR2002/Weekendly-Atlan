@@ -18,7 +18,10 @@ const BrowseView = ({
   handleDragEnd,
   isDragging,
   removeActivityFromBucket,
-  pushBucketToPlan
+  pushBucketToPlan,
+  updateActivityBucketTime,
+  isBucketOpen,
+  setIsBucketOpen
 }) => {
   return (
     <div className="space-y-6">
@@ -33,11 +36,15 @@ const BrowseView = ({
         onDragOver={handleDragOver}
         onRemove={removeActivityFromBucket}
         isDragging={isDragging}
+        onTimeChange={updateActivityBucketTime}
+        isBucketOpen={isBucketOpen}
       />
 
       {activityBucket.length > 0 && (
         <div className="cart">
-          <ShoppingCart className="w-6 h-6" />
+          <button onClick={() => setIsBucketOpen(!isBucketOpen)}>
+            <ShoppingCart className="w-6 h-6" />
+          </button>
           <span>{activityBucket.length} items</span>
           <button onClick={pushBucketToPlan} className="push-to-plan-btn">
             Add Plans<ArrowRight className="w-4 h-4 inline" />
@@ -83,9 +90,15 @@ const BrowseView = ({
                     <ActivityCard
                       activity={{ ...activity, categoryColor: category.color }}
                       isDraggable={true}
-                      showTime={false}
+                      showTime={true}
                       onDragStart={handleDragStart}
                       onDragEnd={handleDragEnd}
+                      onTimeChange={(activityId, _, newTime) => {
+                        const activityToUpdate = category.activities.find(a => a.id === activityId);
+                        if (activityToUpdate) {
+                          addActivityToBucket({ ...activityToUpdate, time: newTime, categoryColor: category.color });
+                        }
+                      }}
                     />
                     <button
                       onClick={() => addActivityToBucket({ ...activity, categoryColor: category.color })}

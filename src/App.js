@@ -21,6 +21,7 @@ const App = () => {
     addActivity,
     removeActivity,
     updateActivityTime,
+    updateActivityBucketTime,
     generateSummary,
     themes,
     activityCategories,
@@ -30,7 +31,12 @@ const App = () => {
     removeActivityFromBucket,
     pushBucketToPlan,
     isDragging,
-    handleDragEnd
+    handleDragEnd,
+    weather,
+    weekendOption,
+    handleWeekendOptionChange,
+    isBucketOpen,
+    setIsBucketOpen
   } = useWeekendPlanner();
 
   return (
@@ -54,6 +60,9 @@ const App = () => {
             isDragging={isDragging}
             removeActivityFromBucket={removeActivityFromBucket}
             pushBucketToPlan={pushBucketToPlan}
+            updateActivityBucketTime={updateActivityBucketTime}
+            isBucketOpen={isBucketOpen}
+            setIsBucketOpen={setIsBucketOpen}
           />
         )}
         {currentView === 'plan' && (
@@ -64,6 +73,9 @@ const App = () => {
             removeActivity={removeActivity}
             updateActivityTime={updateActivityTime}
             handleDragStart={handleDragStart}
+            weather={weather}
+            weekendOption={weekendOption}
+            handleWeekendOptionChange={handleWeekendOptionChange}
           />
         )}
         {currentView === 'share' && (

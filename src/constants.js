@@ -52,3 +52,12 @@ export const themes = {
   romantic: { name: 'Romantic Getaway', color: 'bg-pink-500', icon: 'Gift', activities: ['wine-tasting', 'stargazing', 'spa', 'cooking'] },
   balanced: { name: 'Perfect Balance', color: 'bg-purple-500', icon: 'Scale', activities: ['yoga', 'brunch', 'museum', 'movie'] }
 };
+
+export const weekendOptions = {
+  twoDays: { name: '2-Day Weekend', days: ['saturday', 'sunday'] },
+  threeDaysFriday: { name: '3-Day (Fri-Sun)', days: ['friday', 'saturday', 'sunday'] },
+  threeDaysMonday: { name: '3-Day (Sat-Mon)', days: ['saturday', 'sunday', 'monday'] },
+  fourDaysThursday: { name: '4-Day (Thu-Sun)', days: ['thursday', 'friday', 'saturday', 'sunday'] },
+  fourDaysMonday: { name: '4-Day (Fri-Mon)', days: ['friday', 'saturday', 'sunday', 'monday'] },
+  fourDaysTuesday: { name: '4-Day (Sat-Tue)', days: ['saturday', 'sunday', 'monday', 'tuesday'] }
+};

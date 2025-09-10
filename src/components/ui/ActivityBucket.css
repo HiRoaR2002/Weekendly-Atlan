@@ -12,7 +12,8 @@
   z-index: 1000;
 }
 
-.activity-bucket.dragging {
+.activity-bucket.dragging,
+.activity-bucket.open {
   transform: translateY(0);
 }
 
