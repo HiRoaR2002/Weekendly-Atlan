@@ -3,6 +3,7 @@ import { Calendar, AlertTriangle } from 'lucide-react';
 import ActivityCard from '../ui/ActivityCard';
 import WeatherIcon from '../ui/WeatherIcon';
 import { weekendOptions } from '../../constants';
+import './PlanView.css';
 
 const PlanView = ({
   scheduledActivities,
@@ -29,11 +30,11 @@ const PlanView = ({
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Weekend Plan</h2>
         <p className="text-gray-600">Select your weekend duration and start planning!</p>
-        <div className="mt-4">
+        <div className="mt-4 custom-select-container">
           <select
             value={weekendOption}
             onChange={(e) => handleWeekendOptionChange(e.target.value)}
-            className="bg-white border border-gray-300 rounded-md shadow-sm py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="custom-select bg-white border border-gray-300 rounded-md shadow-sm py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             {Object.entries(weekendOptions).map(([key, option]) => (
               <option key={key} value={key}>
