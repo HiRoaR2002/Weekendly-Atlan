@@ -2,7 +2,8 @@
 
 Weekendly-Atlan is a dynamic web application designed to help you effortlessly plan and organize your perfect weekend. Browse activities, create a custom schedule, get smart weather-based recommendations, and share your itinerary with friends.
 
-![Weekendly-Atlan Screenshot](https://user-images.githubusercontent.com/87914543/229288811-48a2a136-7598-40e1-844a-59f5b1359b3d.png)
+## Live Demo  
+[Weekendly App](https://weekendly-atlan.vercel.app/)
 
 ## ✨ Key Features
 
