@@ -302,6 +302,7 @@ const useWeekendPlanner = () => {
     if (changesMade) {
       setScheduledActivities(newScheduledActivities);
       toast.success('Activities from the bucket have been added to your plan!');
+      setCurrentView('plan');
     }
     setActivityBucket([]);
   };
