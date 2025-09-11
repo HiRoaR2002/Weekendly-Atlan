@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { toPng } from 'html-to-image';
-import { Sun, Moon, Clock, Share2, Download } from 'lucide-react';
+import { Sun, Moon, Clock, Share2, Download, Sunset, Sunrise, CloudSun, CloudMoon, Calendar } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
 const ShareView = ({ themes, selectedTheme, scheduledActivities, generateSummary }) => {
@@ -64,33 +64,30 @@ const ShareView = ({ themes, selectedTheme, scheduledActivities, generateSummary
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-3">
-            <h4 className="font-semibold flex items-center space-x-2">
-              <Sun className="w-5 h-5" />
-              <span>Saturday</span>
-            </h4>
-            {scheduledActivities.saturday.map(activity => (
-              <div key={activity.id} className="flex items-center space-x-2 text-sm opacity-90">
-                <Clock className="w-4 h-4" />
-                <span>{activity.time}</span>
-                <span>{activity.name}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-semibold flex items-center space-x-2">
-              <Moon className="w-5 h-5" />
-              <span>Sunday</span>
-            </h4>
-            {scheduledActivities.sunday.map(activity => (
-              <div key={activity.id} className="flex items-center space-x-2 text-sm opacity-90">
-                <Clock className="w-4 h-4" />
-                <span>{activity.time}</span>
-                <span>{activity.name}</span>
-              </div>
-            ))}
-          </div>
+          {Object.keys(scheduledActivities).map(day => (
+            <div key={day} className="space-y-3">
+              <h4 className="font-semibold flex items-center space-x-2 capitalize">
+                {
+                  {
+                    saturday: <Sun className="w-5 h-5" />,
+                    sunday: <Moon className="w-5 h-5" />,
+                    friday: <Sunset className="w-5 h-5" />,
+                    monday: <Sunrise className="w-5 h-5" />,
+                    thursday: <CloudSun className="w-5 h-5" />,
+                    tuesday: <CloudMoon className="w-5 h-5" />,
+                  }[day] || <Calendar className="w-5 h-5" />
+                }
+                <span>{day}</span>
+              </h4>
+              {scheduledActivities[day].map(activity => (
+                <div key={activity.id} className="flex items-center space-x-2 text-sm opacity-90">
+                  <Clock className="w-4 h-4" />
+                  <span>{activity.time}</span>
+                  <span>{activity.name}</span>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
 

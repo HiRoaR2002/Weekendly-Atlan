@@ -74,34 +74,37 @@ const useWeekendPlanner = () => {
     if (!weather) return;
 
     const suggestAlternatives = (day) => {
-      const dayWeather = weather[day];
-      if (dayWeather >= 51) { // Rainy, snowy, or stormy
-        const outdoorActivity = scheduledActivities[day].find(a => a.category === 'Outdoor');
-        if (outdoorActivity) {
-          const indoorAlternative = getAllActivities().find(a => a.category === 'Indoor' && !scheduledActivities[day].some(sa => sa.id === a.id));
-          if (indoorAlternative) {
-            toast((t) => (
-              <span>
-                Looks like rain on {day}! How about swapping <b>{outdoorActivity.name}</b> for <b>{indoorAlternative.name}</b>?
-                <button
-                  className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
-                  onClick={() => {
-                    removeActivity(outdoorActivity.id, day);
-                    addActivity(indoorAlternative, day);
-                    toast.dismiss(t.id);
-                  }}
-                >
-                  Swap
-                </button>
-              </span>
-            ), { duration: 10000 });
+      if (weather && weather[day]) {
+        const dayWeather = weather[day];
+        if (dayWeather >= 51) { // Rainy, snowy, or stormy
+          const outdoorActivity = scheduledActivities[day].find(a => a.category === 'Outdoor');
+          if (outdoorActivity) {
+            const indoorAlternative = getAllActivities().find(a => a.category === 'Indoor' && !scheduledActivities[day].some(sa => sa.id === a.id));
+            if (indoorAlternative) {
+              toast((t) => (
+                <span>
+                  Looks like rain on {day}! How about swapping <b>{outdoorActivity.name}</b> for <b>{indoorAlternative.name}</b>?
+                  <button
+                    className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
+                    onClick={() => {
+                      removeActivity(outdoorActivity.id, day);
+                      addActivity(indoorAlternative, day);
+                      toast.dismiss(t.id);
+                    }}
+                  >
+                    Swap
+                  </button>
+                </span>
+              ), { duration: 10000 });
+            }
           }
         }
       }
     };
 
-    suggestAlternatives('saturday');
-    suggestAlternatives('sunday');
+    Object.keys(scheduledActivities).forEach(day => {
+      suggestAlternatives(day);
+    });
   }, [weather, scheduledActivities]);
 
   const getAllActivities = () => {
