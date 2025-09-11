@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
-import { Star, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Star, X, Check } from 'lucide-react';
 import * as Icons from 'lucide-react';
+import TimePicker from 'react-time-picker';
+import 'react-time-picker/dist/TimePicker.css';
+import 'react-clock/dist/Clock.css';
+import './ActivityCard.css';
 
 const vibeColors = {
   happy: 'bg-yellow-400 text-yellow-900',
@@ -10,9 +14,27 @@ const vibeColors = {
   adventurous: 'bg-orange-400 text-orange-900'
 };
 
-const ActivityCard = ({ activity, day, showTime = true, isDraggable = true, onDragStart, onDragEnd, onRemove, onTimeChange }) => {
+const ActivityCard = ({ activity, day, showTime = true, isDraggable = true, onDragStart, onDragEnd, onRemove, onTimeChange, onTimeEditConfirm }) => {
   const IconComponent = Icons[activity.icon] || Star;
   const [isHovered, setIsHovered] = useState(false);
+  const [timeEdited, setTimeEdited] = useState(false);
+  const [editedTime, setEditedTime] = useState(activity.time);
+
+  useEffect(() => {
+    setEditedTime(activity.time);
+    setTimeEdited(false);
+  }, [activity.time]);
+
+  const handleTimeChange = (newTime) => {
+    setEditedTime(newTime);
+    setTimeEdited(true);
+    onTimeChange(activity.id, day, newTime);
+  };
+
+  const handleConfirm = () => {
+    onTimeEditConfirm(activity.id, day, editedTime);
+    setTimeEdited(false);
+  };
 
   return (
     <div
@@ -48,12 +70,22 @@ const ActivityCard = ({ activity, day, showTime = true, isDraggable = true, onDr
           {activity.vibe}
         </span>
         {showTime && onTimeChange && (
-          <input
-            type="time"
-            value={activity.time || '12:00'}
-            onChange={(e) => onTimeChange(activity.id, day, e.target.value)}
-            className="text-sm border rounded px-2 py-1"
-          />
+          <div className="flex items-center space-x-2">
+            <div className="time-picker-container">
+              <TimePicker
+                onChange={handleTimeChange}
+                value={editedTime || '12:00'}
+                disableClock={true}
+                clearIcon={null}
+                calendarIcon={null}
+              />
+            </div>
+            {timeEdited && (
+              <button onClick={handleConfirm} className="p-1 text-green-500 hover:text-green-700">
+                <Check className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

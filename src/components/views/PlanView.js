@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, AlertTriangle } from 'lucide-react';
+import { Calendar, AlertTriangle, RotateCcw } from 'lucide-react';
 import ActivityCard from '../ui/ActivityCard';
 import WeatherIcon from '../ui/WeatherIcon';
 import { weekendOptions } from '../../constants';
@@ -12,9 +12,11 @@ const PlanView = ({
   handleDragOver,
   handleDrop,
   removeActivity,
+  resetDay,
   updateActivityTime,
   weekendOption,
-  handleWeekendOptionChange
+  handleWeekendOptionChange,
+  setCurrentView
 }) => {
   const isRainy = (day) => {
     if (!weather || !weather[day]) return false;
@@ -30,18 +32,26 @@ const PlanView = ({
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Weekend Plan</h2>
         <p className="text-gray-600">Select your weekend duration and start planning!</p>
-        <div className="mt-4 custom-select-container">
-          <select
-            value={weekendOption}
-            onChange={(e) => handleWeekendOptionChange(e.target.value)}
-            className="custom-select bg-white border border-gray-300 rounded-md shadow-sm py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+        <div className="mt-4 flex justify-center items-center gap-4">
+          <div className="custom-select-container">
+            <select
+              value={weekendOption}
+              onChange={(e) => handleWeekendOptionChange(e.target.value)}
+              className="custom-select bg-white border border-gray-300 rounded-md shadow-sm py-2 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              {Object.entries(weekendOptions).map(([key, option]) => (
+                <option key={key} value={key}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={() => setCurrentView('browse')}
+            className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
           >
-            {Object.entries(weekendOptions).map(([key, option]) => (
-              <option key={key} value={key}>
-                {option.name}
-              </option>
-            ))}
-          </select>
+            Add Plan
+          </button>
         </div>
       </div>
 
@@ -66,9 +76,18 @@ const PlanView = ({
                   </div>
                 )}
               </div>
-              <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-gray-600">
-                {scheduledActivities[day].length} activities
-              </span>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => resetDay(day)}
+                  className="p-1 text-gray-500 hover:text-red-600 transition-colors"
+                  title="Reset day"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+                <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-gray-600">
+                  {scheduledActivities[day].length} activities
+                </span>
+              </div>
             </div>
 
             <div className="space-y-4">

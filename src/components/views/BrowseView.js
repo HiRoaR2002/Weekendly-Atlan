@@ -20,9 +20,22 @@ const BrowseView = ({
   removeActivityFromBucket,
   pushBucketToPlan,
   updateActivityBucketTime,
+  updateActivityTimeInBrowse,
   isBucketOpen,
   setIsBucketOpen
 }) => {
+  const handleTimeEditConfirm = (activityId, _, newTime) => {
+    const category = Object.values(activityCategories).find(c => c.activities.some(a => a.id === activityId));
+    if (!category) return;
+
+    const activityToUpdate = category.activities.find(a => a.id === activityId);
+    if (activityToUpdate) {
+      if (window.confirm('Do you want to add this activity to the bucket?')) {
+        addActivityToBucket({ ...activityToUpdate, time: newTime, categoryColor: category.color });
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -93,12 +106,8 @@ const BrowseView = ({
                       showTime={true}
                       onDragStart={handleDragStart}
                       onDragEnd={handleDragEnd}
-                      onTimeChange={(activityId, _, newTime) => {
-                        const activityToUpdate = category.activities.find(a => a.id === activityId);
-                        if (activityToUpdate) {
-                          addActivityToBucket({ ...activityToUpdate, time: newTime, categoryColor: category.color });
-                        }
-                      }}
+                      onTimeChange={(activityId, _, newTime) => updateActivityTimeInBrowse(activityId, categoryKey, newTime)}
+                      onTimeEditConfirm={handleTimeEditConfirm}
                     />
                     <button
                       onClick={() => addActivityToBucket({ ...activity, categoryColor: category.color })}

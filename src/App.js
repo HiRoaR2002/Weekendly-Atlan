@@ -22,6 +22,7 @@ const App = () => {
     removeActivity,
     updateActivityTime,
     updateActivityBucketTime,
+    updateActivityTimeInBrowse,
     generateSummary,
     themes,
     activityCategories,
@@ -30,6 +31,7 @@ const App = () => {
     handleDropOnBucket,
     removeActivityFromBucket,
     pushBucketToPlan,
+    resetDay,
     isDragging,
     handleDragEnd,
     weather,
@@ -61,6 +63,7 @@ const App = () => {
             removeActivityFromBucket={removeActivityFromBucket}
             pushBucketToPlan={pushBucketToPlan}
             updateActivityBucketTime={updateActivityBucketTime}
+            updateActivityTimeInBrowse={updateActivityTimeInBrowse}
             isBucketOpen={isBucketOpen}
             setIsBucketOpen={setIsBucketOpen}
           />
@@ -71,11 +74,13 @@ const App = () => {
             handleDragOver={handleDragOver}
             handleDrop={handleDrop}
             removeActivity={removeActivity}
+            resetDay={resetDay}
             updateActivityTime={updateActivityTime}
             handleDragStart={handleDragStart}
             weather={weather}
             weekendOption={weekendOption}
             handleWeekendOptionChange={handleWeekendOptionChange}
+            setCurrentView={setCurrentView}
           />
         )}
         {currentView === 'share' && (

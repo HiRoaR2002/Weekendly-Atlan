@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { themes, activityCategories, weekendOptions } from '../constants';
+import { themes, activityCategories as initialActivityCategories, weekendOptions } from '../constants';
 
 const useWeekendPlanner = () => {
   const [selectedTheme, setSelectedTheme] = useState('balanced');
@@ -16,12 +16,13 @@ const useWeekendPlanner = () => {
   });
   const [draggedActivity, setDraggedActivity] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [currentView, setCurrentView] = useState('plan');
+  const [currentView, setCurrentView] = useState('browse');
   const [activityBucket, setActivityBucket] = useState(() => {
     const saved = localStorage.getItem('weekendly-bucket');
     return saved ? JSON.parse(saved) : [];
   });
   const [isBucketOpen, setIsBucketOpen] = useState(false);
+  const [activityCategories, setActivityCategories] = useState(initialActivityCategories);
 
   useEffect(() => {
     localStorage.setItem('weekendly-schedule', JSON.stringify(scheduledActivities));
@@ -248,6 +249,14 @@ const useWeekendPlanner = () => {
     setActivityBucket(prev => prev.filter(a => a.id !== activityId));
   };
 
+  const resetDay = (day) => {
+    setScheduledActivities(prev => ({
+      ...prev,
+      [day]: []
+    }));
+    toast.success(`All activities for ${day} have been cleared.`);
+  };
+
   const pushBucketToPlan = () => {
     let newScheduledActivities = { ...scheduledActivities };
     let bucket = [...activityBucket];
@@ -322,6 +331,18 @@ const useWeekendPlanner = () => {
     );
   };
 
+  const updateActivityTimeInBrowse = (activityId, categoryKey, newTime) => {
+    setActivityCategories(prev => ({
+      ...prev,
+      [categoryKey]: {
+        ...prev[categoryKey],
+        activities: prev[categoryKey].activities.map(a =>
+          a.id === activityId ? { ...a, time: newTime } : a
+        )
+      }
+    }));
+  };
+
   const generateSummary = () => {
     const totalActivities = Object.values(scheduledActivities).flat().length;
     if (totalActivities === 0) return "Plan your perfect weekend with Weekendly!";
@@ -389,9 +410,11 @@ const useWeekendPlanner = () => {
     handleDropOnBucket,
     removeActivityFromBucket,
     pushBucketToPlan,
+    resetDay,
     removeActivity,
     updateActivityTime,
     updateActivityBucketTime,
+    updateActivityTimeInBrowse,
     generateSummary,
     themes,
     activityCategories,

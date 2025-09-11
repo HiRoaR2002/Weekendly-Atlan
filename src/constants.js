@@ -54,7 +54,7 @@ export const themes = {
 };
 
 export const weekendOptions = {
-  twoDays: { name: 'Default', days: ['saturday', 'sunday'] },
+  twoDays: { name: 'Weekend', days: ['saturday', 'sunday'] },
   threeDaysFriday: { name: '3-Day (Fri-Sun)', days: ['friday', 'saturday', 'sunday'] },
   threeDaysMonday: { name: '3-Day (Sat-Mon)', days: ['saturday', 'sunday', 'monday'] },
   fourDaysThursday: { name: '4-Day (Thu-Sun)', days: ['thursday', 'friday', 'saturday', 'sunday'] },
