@@ -108,4 +108,3 @@ The user journey is split into three main views:
 
 ---
 
-_This README was summarized and enhanced from the original tutorial._
